@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 //Send url of the image clicked
                 intent.putExtra("imageObject", imageArrayList.get(viewHolder.getAdapterPosition())); //I can pass the obkect with the intent because the class implement serializable
                 v.getContext().startActivity(intent);
+
+                Log.d("posizione",String.valueOf(viewHolder.getAdapterPosition()));
             }
         });
 
