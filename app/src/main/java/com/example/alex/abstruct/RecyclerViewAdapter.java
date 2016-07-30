@@ -3,16 +3,15 @@ package com.example.alex.abstruct;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -35,9 +34,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int i) {
 
-
+        ColorDrawable gradientDrawable = new ColorDrawable();
+        gradientDrawable.setColor(Color.parseColor(imageArrayList.get(i).getColor()));
+        /* TODO: Add Ripple Effect on imageview or recycler view item click, don't know where i should do it */
         Picasso.with(context)
                 .load(imageArrayList.get(i).getImageSmallUrl())
+                .placeholder(gradientDrawable)
                 .fit().centerCrop()
                 .into(viewHolder.rowImageView);
 
@@ -49,8 +51,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 //Send url of the image clicked
                 intent.putExtra("imageObject", imageArrayList.get(viewHolder.getAdapterPosition())); //I can pass the obkect with the intent because the class implement serializable
                 v.getContext().startActivity(intent);
-
-                Log.d("posizione",String.valueOf(viewHolder.getAdapterPosition()));
             }
         });
 

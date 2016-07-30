@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        /* TODO: Make the recyler view go to top, if the same tab is clicked, and add swype to refresh */
+
         //Setup ViewPager
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -35,10 +37,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager viewPager) {
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        //I have put the fragments inverted, because otherwise it show the fragments inverted, don't know why ¯\_(ツ)_/¯
-        adapter.addFragment(new PopularFragment(), "LATEST");
-        adapter.addFragment(new LatestFragment(), "POPULAR");
+
+        adapter.addFragment(new LatestFragment(), "LATEST");
+        adapter.addFragment(new PopularFragment(), "POPULAR");
         viewPager.setAdapter(adapter);
     }
 

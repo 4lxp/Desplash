@@ -3,18 +3,18 @@ package com.example.alex.abstruct;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.graphics.Palette;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.github.florent37.picassopalette.PicassoPalette;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
-import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -25,13 +25,6 @@ public class DetailActivity extends AppCompatActivity {
 
         //Set the animation when activity is opened
         overridePendingTransition(R.transition.in_from_right, R.transition.stay_in_place);
-
-        //Setup Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show back button
-        getSupportActionBar().setDisplayShowTitleEnabled(false);    //Hide activity title
-        getSupportActionBar().setTitle("Immagine 1");
 
         initViews();
 
@@ -46,54 +39,70 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
+    //If thh arrow on toolbar is clicked, call the same method of the back button
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            this.onBackPressed();
+
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
 
     private void initViews(){
 
-        final ImageView detailImageView = (ImageView) findViewById(R.id.detailImageView);
+        ImageView detailImageView = (ImageView) findViewById(R.id.detailImageView);
+        CircularImageView authorImageView = (CircularImageView) findViewById(R.id.authorImageView);
+        TextView authorNameTextView = (TextView) findViewById(R.id.authorNameTextView);
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
+        LinearLayout authorLayout = (LinearLayout) findViewById(R.id.authorLayout);
+
 
         //Get the onject from the intent
         ImageClass imageObject = (ImageClass) getIntent().getSerializableExtra("imageObject");
 
-        //Set the title of the image
-        TextView titleTw = (TextView) findViewById(R.id.titleTw);
-        //titleTw.setText(imageObject.getTitle);
+        //Set data
+        Picasso.with(this).load(imageObject.getImageRegularUrl()).into(detailImageView);
+        Picasso.with(this).load(imageObject.getAuthorImage()).into(authorImageView);
+        authorNameTextView.setText(imageObject.getAuthorName());
 
-        //Load image in imageview with picasso, and get image dominant color with Picasso Palette Library
-        Picasso.with(this).load(imageObject.getImageRegularUrl()).into(detailImageView,
-                PicassoPalette.with(imageObject.getImageSmallUrl(), detailImageView)
-                        .intoCallBack(
-                                new PicassoPalette.CallBack() {
-                                    @Override
-                                    public void onPaletteLoaded(Palette palette) {
-
-                                        //palette.getMutedColor(0x00000) This is to get the doinant color
-
-                                        float[] hsv;
-                                        //Make dominant color Brighter
-                                        hsv = new float[3];
-                                        Color.colorToHSV(palette.getMutedColor(0x00000), hsv);
-                                        hsv[2] *= 1.2; //change this to change brightness
-                                        int dominantColor = Color.HSVToColor(hsv);
-
-                                        //Make dominant color Darker
-                                        hsv = new float[3];
-                                        Color.colorToHSV(palette.getMutedColor(0x00000), hsv);
-                                        hsv[2] *= 0.9; //change this to change brightness
-                                        int darkDominantColor = Color.HSVToColor(hsv);
+        //Add pan and zoom funcionality to detailImageView
+        PhotoViewAttacher attacher = new PhotoViewAttacher(detailImageView);
 
 
-                                        //Set color to status bar
-                                        Window window = getWindow();
-                                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                                        window.setStatusBarColor(Color.TRANSPARENT);
-                                        window.setNavigationBarColor(darkDominantColor);
+        //Get and  edit colors
+        int dominantColor =Color.parseColor(imageObject.getColor());
+
+        //Code to make a color darker or brighter
+        float[] hsv;
+        //Make dominant color Brighter
+        hsv = new float[3];
+        Color.colorToHSV(dominantColor, hsv);
+        hsv[2] *= 6; //change this to change brightness
+        int brightDominantColor = Color.HSVToColor(hsv);
+
+        //Make dominant color Darker
+        hsv = new float[3];
+        Color.colorToHSV(dominantColor, hsv);
+        hsv[2] *= 0.7; //change this to change brightness
+        int darkDominantColor = Color.HSVToColor(hsv);
 
 
-                                        LinearLayout titleLayout =(LinearLayout) findViewById(R.id.titleLayout);
-                                        titleLayout.setBackgroundColor(dominantColor);
-                                    }
-                                })
-        );
+        //Set color to various elements
+        Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(darkDominantColor);
+
+        window.setNavigationBarColor(darkDominantColor);
+
+        frameLayout.setBackgroundColor(dominantColor);
+
+        authorLayout.setBackgroundColor(darkDominantColor);
+
+        authorNameTextView.setTextColor(brightDominantColor);
+
+
     }
 
 }

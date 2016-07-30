@@ -26,6 +26,7 @@ public class LatestFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_latest, container, false);
 
+        // TODO: Resolve E/RecyclerView: No adapter attached; skipping layout
         //Setup Recycler View
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -88,11 +89,18 @@ public class LatestFragment extends Fragment {
                 //Parse json, get photo's data
                 JSONObject photo = (JSONObject) jsonResponse.get(i);
                 JSONObject photoUrls = photo.getJSONObject("urls");
+                JSONObject author = photo.getJSONObject("user");
+                JSONObject authorImages = author.getJSONObject("profile_image");
 
                 String imageSmallUrl = photoUrls.getString("small"); //thumb,small,regular,full,raw
                 String imageRegularUrl = photoUrls.getString("regular");
                 String imageFullUrl = photoUrls.getString("full");
                 String imageRawUrl = photoUrls.getString("raw");
+                String color= photo.getString("color");
+                int likes= photo.getInt("likes");
+                String authorUserName = author.getString("username");
+                String authorName = author.getString("name");
+                String authorImage = authorImages.getString("large");
 
                 //Send data to the ImageCLass
                 ImageClass imageClass = new ImageClass();
@@ -100,6 +108,11 @@ public class LatestFragment extends Fragment {
                 imageClass.setImageRegularUrl(imageRegularUrl);
                 imageClass.setImageFullUrl(imageFullUrl);
                 imageClass.setImageRawUrl(imageRawUrl);
+                imageClass.setColor(color);
+                imageClass.setLikes(likes);
+                imageClass.setAuthorUserName(authorUserName);
+                imageClass.setAuthorName(authorName);
+                imageClass.setAuthorImage(authorImage);
 
                 //Add ImageClass object to the imageArrayList
                 imageArrayList.add(imageClass);
