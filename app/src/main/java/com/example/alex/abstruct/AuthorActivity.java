@@ -1,54 +1,72 @@
 package com.example.alex.abstruct;
 
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-public class PopularFragment extends Fragment {
+public class AuthorActivity extends AppCompatActivity {
 
+    ImageClass imageObject;
     private View view;
     private ArrayList imageArrayList = new ArrayList<>();
     private RecyclerViewAdapter recyclerViewAdapter;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
+    private CircularImageView authorImageView;
     private String url;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_author);
 
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_popular, container, false);
+        //Get object from intent
+        imageObject = (ImageClass) getIntent().getSerializableExtra("imageObject");
 
         initViews();
+
+        setViewsData();
 
         firstRecyclerViewLoad();
 
         nextRecyclerViewLoads();
-
-        return view;
 
     }
 
     private void initViews(){
 
         // TODO: Fix E/RecyclerView: No adapter attached; skipping layout
+
+        //Setup Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         //Setup Recycler View
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+
+        authorImageView = (CircularImageView) findViewById(R.id.authorImageView);
+
+    }
+
+    private void setViewsData(){
+
+        Picasso.with(this).load(imageObject.getAuthorImage()).into(authorImageView);
 
     }
 
     private void firstRecyclerViewLoad(){
-        url = "https://api.unsplash.com/photos?per_page=20&page=1&order_by=popular&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
+        url = "https://api.unsplash.com/users/"+imageObject.getAuthorUserName()+"/photos?order_by=latest&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
 
         boolean isFirstPage = true;
 
@@ -62,7 +80,7 @@ public class PopularFragment extends Fragment {
             public void onLoadMore(int current_page) {
 
                 //Update url whit the new page number
-                url = "https://api.unsplash.com/photos?per_page=20&page="+String.valueOf(current_page)+"&order_by=popular&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
+                String url = "https://api.unsplash.com//users/"+imageObject.getAuthorUserName()+"/photos?per_page=20&page="+String.valueOf(current_page)+"&order_by=latest&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
 
                 //Set the boolean to false, because there is no need to reset the adapter
                 boolean isFirstPage = false;
@@ -75,16 +93,14 @@ public class PopularFragment extends Fragment {
 
     private void setRecyclerViewAdapter(){
 
-        recyclerViewAdapter = new RecyclerViewAdapter(getActivity(), imageArrayList);
+        recyclerViewAdapter = new RecyclerViewAdapter(this, imageArrayList);
         recyclerView.setAdapter(recyclerViewAdapter);
 
     }
 
-
-
     private void getJsonArray(String url, final boolean isFirstPage){
 
-        JsonRequest jsonRequest = new JsonRequest(url, getContext());
+        JsonRequest jsonRequest = new JsonRequest(url, this);
 
         jsonRequest.getJsonData(new VolleyCallback(){
 
@@ -147,5 +163,4 @@ public class PopularFragment extends Fragment {
         }
 
     }
-
 }

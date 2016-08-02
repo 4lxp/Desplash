@@ -8,6 +8,7 @@ android:layout_height="match_parent"
 android:orientation="vertical"
 android:id="@+id/frameLayout">
 
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -36,7 +37,8 @@ android:id="@+id/frameLayout">
             app:civ_shadow="false"
             android:id="@+id/authorImageView"
             android:layout_gravity="center"
-            android:layout_marginRight="16dp"/>
+            android:layout_marginRight="16dp"
+            />
 
 
         <TextView

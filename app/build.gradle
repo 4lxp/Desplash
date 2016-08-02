@@ -30,10 +30,11 @@ dependencies {
     compile 'com.android.support:design:23.4.0'
     compile 'com.android.support:palette-v7:23.4.0'
     compile 'com.android.volley:volley:1.0.0'
-    compile 'com.android.support:support-v4:23.4.0'
+    compile ('com.android.support:support-v4:23.4.0'){
+        force = true; //Otherwise collapsing tollbar doesn't work
+    }
     compile 'com.mikhaellopez:circularimageview:3.0.2'
     compile 'com.github.chrisbanes:PhotoView:1.2.7'
-
 
 
 }

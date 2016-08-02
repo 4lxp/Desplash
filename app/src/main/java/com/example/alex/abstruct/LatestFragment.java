@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class LatestFragment extends Fragment {
@@ -19,6 +18,8 @@ public class LatestFragment extends Fragment {
     private ArrayList imageArrayList = new ArrayList<>();
     private RecyclerViewAdapter recyclerViewAdapter;
     private RecyclerView recyclerView;
+    private LinearLayoutManager layoutManager;
+    private String url;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -26,25 +27,42 @@ public class LatestFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_latest, container, false);
 
-        // TODO: Resolve E/RecyclerView: No adapter attached; skipping layout
+        initViews();
+
+        firstRecyclerViewLoad();
+
+        nextRecyclerViewLoads();
+
+        return view;
+
+    }
+
+    private void initViews(){
+
+        // TODO: Fix E/RecyclerView: No adapter attached; skipping layout
         //Setup Recycler View
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        String url = "https://api.unsplash.com/photos?per_page=20&page=1&order_by=latest&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
+    }
+
+    private void firstRecyclerViewLoad(){
+        url = "https://api.unsplash.com/photos?per_page=20&page=1&order_by=latest&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
 
         boolean isFirstPage = true;
 
         getJsonArray(url,isFirstPage); //Make the request for the json, using the url, and the boolean isFirstPage, to check if set the adapter or not
+    }
 
+    private void nextRecyclerViewLoads(){
         //What to do when recycler view reach the end of the page
         recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
 
                 //Update url whit the new page number
-                String url = "https://api.unsplash.com/photos?per_page=20&page="+String.valueOf(current_page)+"&order_by=latest&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
+                url = "https://api.unsplash.com/photos?per_page=20&page="+String.valueOf(current_page)+"&order_by=latest&client_id=42af43eb53971d07987caea0f6474d8592f3633d1f810a92ba3468f36fa44a25";
 
                 //Set the boolean to false, because there is no need to reset the adapter
                 boolean isFirstPage = false;
@@ -53,10 +71,16 @@ public class LatestFragment extends Fragment {
 
             }
         });
+    }
 
-        return view;
+    private void setRecyclerViewAdapter(){
+
+        recyclerViewAdapter = new RecyclerViewAdapter(getActivity(), imageArrayList);
+        recyclerView.setAdapter(recyclerViewAdapter);
 
     }
+
+
 
     private void getJsonArray(String url, final boolean isFirstPage){
 
@@ -80,7 +104,6 @@ public class LatestFragment extends Fragment {
 
     private void parseJsonIntoArrayList(JSONArray jsonResponse){
 
-
         try {
 
             //Loop trough all the node in json
@@ -92,6 +115,7 @@ public class LatestFragment extends Fragment {
                 JSONObject author = photo.getJSONObject("user");
                 JSONObject authorImages = author.getJSONObject("profile_image");
 
+                //Put data into variables
                 String imageSmallUrl = photoUrls.getString("small"); //thumb,small,regular,full,raw
                 String imageRegularUrl = photoUrls.getString("regular");
                 String imageFullUrl = photoUrls.getString("full");
@@ -116,7 +140,6 @@ public class LatestFragment extends Fragment {
 
                 //Add ImageClass object to the imageArrayList
                 imageArrayList.add(imageClass);
-
             }
 
         } catch (JSONException e) {
@@ -124,15 +147,5 @@ public class LatestFragment extends Fragment {
         }
 
     }
-
-    private void setRecyclerViewAdapter(){
-
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-
-        recyclerViewAdapter = new RecyclerViewAdapter(getActivity(), imageArrayList);
-        recyclerView.setAdapter(recyclerViewAdapter);
-
-    }
-
 
 }
