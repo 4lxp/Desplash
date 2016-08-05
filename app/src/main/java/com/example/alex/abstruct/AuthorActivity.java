@@ -1,11 +1,14 @@
 package com.example.alex.abstruct;
 
+import android.graphics.Color;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
@@ -15,14 +18,16 @@ import java.util.ArrayList;
 
 public class AuthorActivity extends AppCompatActivity {
 
-    ImageClass imageObject;
-    private View view;
+    private ImageClass imageObject;
     private ArrayList imageArrayList = new ArrayList<>();
     private RecyclerViewAdapter recyclerViewAdapter;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private Toolbar toolbar;
     private CircularImageView authorImageView;
     private String url;
+    private int dominantColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,8 @@ public class AuthorActivity extends AppCompatActivity {
 
         setViewsData();
 
+        setViewsColors();
+
         firstRecyclerViewLoad();
 
         nextRecyclerViewLoads();
@@ -47,7 +54,8 @@ public class AuthorActivity extends AppCompatActivity {
         // TODO: Fix E/RecyclerView: No adapter attached; skipping layout
 
         //Setup Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         setSupportActionBar(toolbar);
 
         //Setup Recycler View
@@ -61,8 +69,47 @@ public class AuthorActivity extends AppCompatActivity {
 
     private void setViewsData(){
 
+        collapsingToolbarLayout.setTitle(imageObject.getAuthorName());
         Picasso.with(this).load(imageObject.getAuthorImage()).into(authorImageView);
 
+    }
+
+    private void setViewsColors(){
+
+        //Get and  edit colors
+        dominantColor = Color.parseColor(imageObject.getColor());
+
+        //Code to make a color darker or brighter
+        float[] hsv;
+
+        //Make dominant color Brighter
+        hsv = new float[3];
+        Color.colorToHSV(dominantColor, hsv);
+        hsv[2] *= 6; //change this to change brightness
+        int brightDominantColor = Color.HSVToColor(hsv);
+
+        //Make dominant color Darker
+        hsv = new float[3];
+        Color.colorToHSV(dominantColor, hsv);
+        hsv[2] *= 0.7; //change this to change brightness
+        int darkDominantColor = Color.HSVToColor(hsv);
+
+        //Make dominant color Darker
+        hsv = new float[3];
+        Color.colorToHSV(darkDominantColor, hsv);
+        hsv[2] *= 0.7; //change this to change brightness
+        int darkDarkDominantColor = Color.HSVToColor(hsv);
+
+
+        //Set color to various elements
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(darkDarkDominantColor);
+        //window.setNavigationBarColor(darkDominantColor);
+
+        collapsingToolbarLayout.setBackgroundColor(darkDominantColor);
+        collapsingToolbarLayout.setCollapsedTitleTextColor(brightDominantColor);
+        collapsingToolbarLayout.setExpandedTitleColor(brightDominantColor);
     }
 
     private void firstRecyclerViewLoad(){
