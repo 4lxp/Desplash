@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--Contains the items of the overflow menu in detail activity-->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/set_wallpaper"
+        android:title="Set as Wallpaper"/>
+
+    <item android:id="@+id/share_photo"
+        android:title="Share this Photo" />
+</menu>

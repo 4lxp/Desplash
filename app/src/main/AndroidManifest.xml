@@ -3,7 +3,7 @@
     package="com.example.alex.abstruct">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetailActivity" />
-        <activity android:name=".AuthorActivity"></activity>
+        <activity android:name=".AuthorActivity" />
     </application>
 
 </manifest>

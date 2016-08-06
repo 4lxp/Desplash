@@ -1,19 +1,31 @@
 package com.example.alex.abstruct;
 
+import android.app.WallpaperManager;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class DetailActivity extends AppCompatActivity {
@@ -21,12 +33,13 @@ public class DetailActivity extends AppCompatActivity {
     private boolean isFirstTouch=true;
     private FrameLayout frameLayout;
     private int dominantColor;
-    private LinearLayout authorLayout;
     private ImageClass imageObject;
     private CircularImageView authorImageView;
     private ImageView detailImageView;
     private TextView authorNameTextView;
     private PhotoViewAttacher attacher;
+    private Toolbar toolbar;
+    private Drawable overflowIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +61,6 @@ public class DetailActivity extends AppCompatActivity {
 
         //Set colors to the various elements of the ui
         setViewsColors();
-
     }
 
     @Override
@@ -61,18 +73,44 @@ public class DetailActivity extends AppCompatActivity {
     }
 
 
-    //If thh arrow on toolbar is clicked, call the same method of the back button
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home) {
-            this.onBackPressed();
+        // Handle item selection
+        switch (menuItem.getItemId()) {
 
+            //Back Arrow
+            case R.id.home:
+                this.onBackPressed();
+                return true;
+
+            case R.id.set_wallpaper:
+                setWallpaper();
+                return true;
+
+            case R.id.share_photo:
+                sharePhoto();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(menuItem);
         }
-        return super.onOptionsItemSelected(menuItem);
+
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.detail_activity_menu, menu);
+        return true;
+    }
 
     private void initViews(){
+
+        //Setup Toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         detailImageView = (ImageView) findViewById(R.id.detailImageView);
         //Add pan and zoom functionality to detailImageView
@@ -81,7 +119,6 @@ public class DetailActivity extends AppCompatActivity {
         authorImageView = (CircularImageView) findViewById(R.id.authorImageView);
         authorNameTextView = (TextView) findViewById(R.id.authorNameTextView);
         frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
-        authorLayout = (LinearLayout) findViewById(R.id.authorLayout);
 
     }
 
@@ -98,8 +135,8 @@ public class DetailActivity extends AppCompatActivity {
 
         });
 
-        //AuthorLayout click
-        authorLayout.setOnClickListener(new View.OnClickListener() {
+        //toolbar click
+        toolbar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 //Start AuthorActivity
@@ -139,15 +176,28 @@ public class DetailActivity extends AppCompatActivity {
         hsv[2] *= 0.7; //change this to change brightness
         int darkDominantColor = Color.HSVToColor(hsv);
 
+        //Make dominant color Darker
+        hsv = new float[3];
+        Color.colorToHSV(darkDominantColor, hsv);
+        hsv[2] *= 0.7; //change this to change brightness
+        int darkDarkDominantColor = Color.HSVToColor(hsv);
+
 
         //Set color to various elements
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(darkDominantColor);
-        window.setNavigationBarColor(darkDominantColor);
+        window.setStatusBarColor(darkDarkDominantColor);
+        window.setNavigationBarColor(darkDarkDominantColor);
+
+        toolbar.setBackgroundColor(darkDominantColor);
+
+        //Set color to the overflow icon
+        overflowIcon = toolbar.getOverflowIcon();
+        overflowIcon = DrawableCompat.wrap(overflowIcon);
+        DrawableCompat.setTint(overflowIcon.mutate(), brightDominantColor);
+        toolbar.setOverflowIcon(overflowIcon);
 
         frameLayout.setBackgroundColor(dominantColor);
-        authorLayout.setBackgroundColor(darkDominantColor);
         authorNameTextView.setTextColor(brightDominantColor);
     }
 
@@ -167,7 +217,7 @@ public class DetailActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
 
             frameLayout.setBackgroundColor(Color.BLACK);
-            authorLayout.setVisibility(View.INVISIBLE);
+            toolbar.setVisibility(View.INVISIBLE);
 
         } else {
 
@@ -176,8 +226,81 @@ public class DetailActivity extends AppCompatActivity {
 
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             frameLayout.setBackgroundColor(dominantColor);
-            authorLayout.setVisibility(View.VISIBLE);
+            toolbar.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void setWallpaper(){
+        Target target = new Target() {
+
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        };
+
+        Picasso.with(this).load(imageObject.getImageRegularUrl()).into(target);
+
+    }
+
+    private void sharePhoto(){
+        Target target = new Target() {
+
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                try {
+
+                    //Save the image locally
+                    File file = new File(DetailActivity.this.getCacheDir(), "photo" + ".png");
+                    FileOutputStream fOut = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    fOut.flush();
+                    fOut.close();
+                    file.setReadable(true, false);
+
+                    //Share the photo
+                    Uri uri = Uri.fromFile(file);
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("image/*");
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
+                    intent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+                    intent.putExtra(Intent.EXTRA_STREAM, uri);
+                    startActivity(Intent.createChooser(intent, "Share this photo"));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        };
+
+        Picasso.with(this).load(imageObject.getImageRegularUrl()).into(target);
+
     }
 
 }

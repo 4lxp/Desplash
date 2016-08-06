@@ -1,12 +1,16 @@
 package com.example.alex.abstruct;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import com.mikhaellopez.circularimageview.CircularImageView;
@@ -28,6 +32,7 @@ public class AuthorActivity extends AppCompatActivity {
     private CircularImageView authorImageView;
     private String url;
     private int dominantColor;
+    private Drawable upArrow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,18 @@ public class AuthorActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            //Back arrow clik on toolbar
+            case android.R.id.home:
+                this.onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void initViews(){
 
         // TODO: Fix E/RecyclerView: No adapter attached; skipping layout
@@ -57,6 +74,7 @@ public class AuthorActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Setup Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -106,6 +124,10 @@ public class AuthorActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(darkDarkDominantColor);
         //window.setNavigationBarColor(darkDominantColor);
+
+        upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        upArrow.setColorFilter(brightDominantColor, PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow); //Set the drawable upArrow, i use a custom drawable because i want it colored
 
         collapsingToolbarLayout.setBackgroundColor(darkDominantColor);
         collapsingToolbarLayout.setCollapsedTitleTextColor(brightDominantColor);
