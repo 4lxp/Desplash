@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         //Setup Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("DESPLASH");
 
         /* TODO: Make the recyler view go to top, if the same tab is clicked, and add swype to refresh */
 
