@@ -9,11 +9,10 @@ Desplash includes the following features:
 * Set images as wallpaper
 * Share photos on social networks or other apps
 
-#[Download Desplash apk](https://github.com/AlexPagnotta/Desplash/raw/master/Desplash.apk)
+[Download Desplash apk](https://github.com/AlexPagnotta/Desplash/raw/master/Desplash.apk)
 
-#Screenshots
 <img src="http://i.imgur.com/QgnD5nX.png" width="360" heigth="640">
 <img src="http://i.imgur.com/1H620xj.png" width="360" heigth="640">
 <img src="http://i.imgur.com/iROu2KF.png" width="360" heigth="640">
 
-#Developed by Alex Pagnotta
+# Developed by Alex Pagnotta
